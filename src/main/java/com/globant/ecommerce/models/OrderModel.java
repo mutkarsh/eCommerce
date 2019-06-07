@@ -20,13 +20,14 @@ public class OrderModel {
 	private String deliverystatus;
 	private String paymentstatus;
 	private String expecteddelivery;
+	private String transactionid;
 
 	public OrderModel() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public OrderModel(int orderid, int userid, List<ProductModel> products, double totalamount, String address,
-			String deliverystatus, String paymentstatus, String expecteddelivery) {
+			String deliverystatus, String paymentstatus, String expecteddelivery, String transactionid) {
 		super();
 		this.orderid = orderid;
 		this.userid = userid;
@@ -36,7 +37,10 @@ public class OrderModel {
 		this.deliverystatus = deliverystatus;
 		this.paymentstatus = paymentstatus;
 		this.expecteddelivery = expecteddelivery;
+		this.transactionid = transactionid;
 	}
+
+
 
 	public int getOrderid() {
 		return orderid;
@@ -102,5 +106,13 @@ public class OrderModel {
 		this.expecteddelivery = expecteddelivery;
 	}
 
+	public String getTransactionid() {
+		return transactionid;
+	}
+
+	public void setTransactionid(String transactionid) {
+		this.transactionid = transactionid;
+	}
+	
 	
 }

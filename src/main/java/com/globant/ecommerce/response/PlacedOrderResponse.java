@@ -4,16 +4,17 @@ import java.util.List;
 
 import com.globant.ecommerce.models.OrderModel;
 
-public class Response {
-
+public class PlacedOrderResponse {
+	
 	private String Message;
 	private String StatusCode;
 	private List<OrderModel> Data;
 	
-	public Response() {
+	public PlacedOrderResponse() {
+		// TODO Auto-generated constructor stub
 	}
 
-	public Response(String message, String statusCode, List<OrderModel> data) {
+	public PlacedOrderResponse(String message, String statusCode, List<OrderModel> data) {
 		super();
 		Message = message;
 		StatusCode = statusCode;
@@ -43,7 +44,7 @@ public class Response {
 	public void setData(List<OrderModel> data) {
 		Data = data;
 	}
-
+	
 	
 
- }
+}

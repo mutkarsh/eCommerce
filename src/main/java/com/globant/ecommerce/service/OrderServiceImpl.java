@@ -1,5 +1,7 @@
 package com.globant.ecommerce.service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,32 @@ public class OrderServiceImpl implements OrderService{
 		return orderdao.viewOrder(userid);
 	}
 
-//	@Override
-//	public void addOrder(OrderModel order) {
-//		// TODO Auto-generated method stub
-//		orderdao.addOrder(order);
-//		
-//	}
+	@Override
+	public boolean addOrder(OrderModel order) {
+		// TODO Auto-generated method stub
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.DATE, 5);
+		Date newDate = cal.getTime();
+		
+		order.setDeliverystatus("Not Delivered");
+		order.setExpecteddelivery(newDate+"");
+		return orderdao.addOrder(order);	
+	}
+	
+	@Override
+	public List<OrderModel> viewOrderByOrderId(int orderid) {
+		// TODO Auto-generated method stub
+		return orderdao.viewOrderByOrderId(orderid);
+	}
+
+	@Override
+	public int getOrderid(String transactionid) {
+		// TODO Auto-generated method stub
+		return orderdao.getOrderid(transactionid);
+	}
+	
 //
 //	@Override
 //	public void updateOrder(OrderModel order) {
@@ -34,11 +56,13 @@ public class OrderServiceImpl implements OrderService{
 //		
 //	}
 //
-//	@Override
-//	public void cancelorder(int orderid) {
-//		// TODO Auto-generated method stub
-//		orderdao.cancelorder(orderid);
-//	}
+	@Override
+	public boolean cancelorder(int orderid) {
+		// TODO Auto-generated method stub
+		return orderdao.cancelorder(orderid);
+	}
+
+	
 
 	
 }
