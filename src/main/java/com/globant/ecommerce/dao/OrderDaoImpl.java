@@ -1,5 +1,6 @@
 package com.globant.ecommerce.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +23,29 @@ public class OrderDaoImpl implements OrderDao {
 	JdbcTemplate jdbctemplate;
 
 	/**
-	 * Fetch All orders from DB of specific user 
+	 * Fetch All orders from DB of specific user
 	 */
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 
 		String QUERY = "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery from orders where userid=? and status=?";
 		Object param[] = { userid, "confirmed" };
-		List<OrderModel> om = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
-		for (OrderModel orderModel : om) {
-			String QUERY1 = "select productid,quantity,price from products where orderid=?";
-			Object param1[] = { orderModel.getOrderid() };
-			List<ProductModel> pm = jdbctemplate.query(QUERY1, param1,
-					new BeanPropertyRowMapper<ProductModel>(ProductModel.class));
-			orderModel.setProducts(pm);
-		}
+		List<OrderModel> orders = new ArrayList<OrderModel>();
+		List<ProductModel> products = new ArrayList<ProductModel>();
+		try {
 
-		return om;
+			orders = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
+			for (OrderModel orderModel : orders) {
+				String QUERY1 = "select productid,quantity,price from products where orderid=?";
+				Object param1[] = { orderModel.getOrderid() };
+				products = jdbctemplate.query(QUERY1, param1,
+						new BeanPropertyRowMapper<ProductModel>(ProductModel.class));
+				orderModel.setProducts(products);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return orders;
 	}
 
 	/**
@@ -50,19 +57,24 @@ public class OrderDaoImpl implements OrderDao {
 		String QUERY = "insert into orders(userid,address,totalamount,paymentstatus,deliverystatus,expecteddelivery,transactionid,status) values(?,?,?,?,?,?,?,?)";
 		Object param[] = { order.getUserid(), order.getAddress(), order.getTotalamount(), order.getPaymentstatus(),
 				order.getDeliverystatus(), order.getExpecteddelivery(), order.getTransactionid(), "Confirmed" };
-		jdbctemplate.update(QUERY, param);
+		int result = 0;
+		try {
 
-		int orderid = getOrderid(order.getTransactionid());
+			result = jdbctemplate.update(QUERY, param);
 
-		String QUERY1 = "insert into products(productid,quantity,price,orderid) values(?,?,?,?)";
-		List<ProductModel> products = order.getProducts();
-		for (ProductModel productModel : products) {
-			Object param1[] = { productModel.getProductid(), productModel.getQuantity(), productModel.getPrice(),
-					orderid };
-			jdbctemplate.update(QUERY1, param1);
+			int orderid = getOrderid(order.getTransactionid());
+
+			String QUERY1 = "insert into products(productid,quantity,price,orderid) values(?,?,?,?)";
+			List<ProductModel> products = order.getProducts();
+			for (ProductModel productModel : products) {
+				Object param1[] = { productModel.getProductid(), productModel.getQuantity(), productModel.getPrice(),
+						orderid };
+				jdbctemplate.update(QUERY1, param1);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-
-		return true;
+		return result > 0 ? true : false;
 	}
 
 	/**
@@ -73,8 +85,14 @@ public class OrderDaoImpl implements OrderDao {
 
 		String QUERY = "select orderid,deliverystatus,expecteddelivery,transactionid from orders where orderid=? and status=?";
 		Object param[] = { orderid, "confirmed" };
-		List<OrderModel> om = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
-		return om;
+		List<OrderModel> orders = new ArrayList<OrderModel>();
+		try {
+
+			orders = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return orders;
 	}
 
 	/**
@@ -85,20 +103,30 @@ public class OrderDaoImpl implements OrderDao {
 
 		String QUERY = "select orderid from orders where transactionid=? and status=?";
 		Object param[] = { transactionid, "confirmed" };
-		int orderid = jdbctemplate.queryForObject(QUERY, param, Integer.class);
+		int orderid = -1;
+		try {
+			orderid = jdbctemplate.queryForObject(QUERY, param, Integer.class);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 		return orderid;
 	}
 
 	/**
-	 * Method to cancel the order 
+	 * Method to cancel the order
 	 */
 	@Override
 	public boolean cancelorder(int orderid) {
 		String QUERY = "update orders set status=? where orderid=?";
 		Object param[] = { "Cancelled", orderid };
-		int i = jdbctemplate.update(QUERY, param);
-
+		int i = 0;
+		try {
+			i = jdbctemplate.update(QUERY, param);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		return i > 0 ? true : false;
 	}
 
@@ -107,12 +135,20 @@ public class OrderDaoImpl implements OrderDao {
 	 */
 	@Override
 	public boolean updateorder(OrderModel order) {
-		
+
 		String QUERY = "update orders set deliverystatus=? ,paymentstatus=?, expecteddelivery=? where orderid=?";
-		Object param[] = {order.getDeliverystatus(), order.getPaymentstatus(), order.getExpecteddelivery(), order.getOrderid()};
-		int i = jdbctemplate.update(QUERY, param);
+		Object param[] = { order.getDeliverystatus(), order.getPaymentstatus(), order.getExpecteddelivery(),
+				order.getOrderid() };
 		
-		return i > 0 ? true : false; 
+		int i =0;
+		try {
+			i = jdbctemplate.update(QUERY, param);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		return i > 0 ? true : false;
 	}
 
 }
