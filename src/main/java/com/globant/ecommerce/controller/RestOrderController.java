@@ -45,13 +45,13 @@ public class RestOrderController {
 	 * @param authToken
 	 * @return
 	 */
-	@GetMapping("/viewOrder/{userid}")
+	@GetMapping("/order/viewOrder/{userid}")
 	public Response viewOrder(@PathVariable("userid") int userid,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
 		Response resp = new Response();
 
-		// TODO: check validity based on user authToken
+		//  check validity based on user authToken
 		if (authentication(authToken)) {
 			List<OrderModel> om = orderservice.viewOrder(userid);
 			resp.setMessage("Your Orders");
@@ -74,13 +74,13 @@ public class RestOrderController {
 	 * @param authToken
 	 * @return
 	 */
-	@PostMapping("/placeorder/{userid}")
+	@PostMapping("/order/placeorder/{userid}")
 	public PlacedOrderResponse placeOrder(@PathVariable("userid") int userid, @RequestBody String data,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
 		PlacedOrderResponse response = new PlacedOrderResponse();
 
-		// TODO: check validity based on user authToken
+		//  check validity based on user authToken
 		if (authentication(authToken)) {
 			JSONObject object = new JSONObject(data);
 			OrderModel order = new OrderModel();
@@ -119,13 +119,13 @@ public class RestOrderController {
 	 * @param authToken
 	 * @return
 	 */
-	@PostMapping("/cancelorder/{orderid}")
+	@PostMapping("/order/cancelorder/{orderid}")
 	public Response cancelOrder(@PathVariable("orderid") int orderid,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
 		Response response = new Response();
 
-		// TODO: check validity based on user authToken
+		//  check validity based on user authToken
 		if (authentication(authToken)) {
 			orderservice.cancelorder(orderid);
 			response.setMessage("Order Cancelled Successfully");
@@ -149,10 +149,12 @@ public class RestOrderController {
 	 * @param authToken
 	 * @return
 	 */
+	@PostMapping("/order/updateOrder/{orderid}")
 	public Response updateOrder(@PathVariable("orderid") int orderid, @RequestBody String data,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 		
 		Response response = new Response();
+		// check validity based on user authToken
 		if(authentication(authToken)) {
 			
 			JSONObject object = new JSONObject(data);
