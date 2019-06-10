@@ -21,6 +21,9 @@ public class OrderDaoImpl implements OrderDao {
 	@Autowired
 	JdbcTemplate jdbctemplate;
 
+	/**
+	 * Fetch All orders from DB of specific user 
+	 */
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 
@@ -38,6 +41,9 @@ public class OrderDaoImpl implements OrderDao {
 		return om;
 	}
 
+	/**
+	 * Add a new order made
+	 */
 	@Override
 	public boolean addOrder(OrderModel order) {
 
@@ -59,6 +65,9 @@ public class OrderDaoImpl implements OrderDao {
 		return true;
 	}
 
+	/**
+	 * method to retrive a order by orderid
+	 */
 	@Override
 	public List<OrderModel> viewOrderByOrderId(int orderid) {
 
@@ -68,6 +77,9 @@ public class OrderDaoImpl implements OrderDao {
 		return om;
 	}
 
+	/**
+	 * Method to get orderid by transactionid
+	 */
 	@Override
 	public int getOrderid(String transactionid) {
 
@@ -78,6 +90,9 @@ public class OrderDaoImpl implements OrderDao {
 		return orderid;
 	}
 
+	/**
+	 * Method to cancel the order 
+	 */
 	@Override
 	public boolean cancelorder(int orderid) {
 		String QUERY = "update orders set status=? where orderid=?";
@@ -87,6 +102,9 @@ public class OrderDaoImpl implements OrderDao {
 		return i > 0 ? true : false;
 	}
 
+	/**
+	 * method to update the status of the order
+	 */
 	@Override
 	public boolean updateorder(OrderModel order) {
 		

@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
  * 
  * @author utkarsh.mandade
  *
+ * SrpingBootApplication
  */
 @SpringBootApplication
 @ComponentScan({ "com.globant" })
@@ -20,7 +21,7 @@ public class EcommerceApplication {
 		SpringApplication.run(EcommerceApplication.class, args);
 
 	}
-
+ 
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
