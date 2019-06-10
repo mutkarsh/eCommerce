@@ -5,89 +5,96 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Service;
 
 import com.globant.ecommerce.models.OrderModel;
 import com.globant.ecommerce.models.ProductModel;
-import com.globant.ecommerce.response.Response;
 
+/**
+ * 
+ * @author utkarsh.mandade
+ *
+ */
 @Service
-public class OrderDaoImpl implements OrderDao{
-	
+public class OrderDaoImpl implements OrderDao {
+
 	@Autowired
 	JdbcTemplate jdbctemplate;
 
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
-		
-		String QUERY= "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery from orders where userid=? and status=?";
-		Object param[] = { userid,"confirmed" }; 
-		List<OrderModel> om = jdbctemplate.query(QUERY,param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
+
+		String QUERY = "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery from orders where userid=? and status=?";
+		Object param[] = { userid, "confirmed" };
+		List<OrderModel> om = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
 		for (OrderModel orderModel : om) {
-			String QUERY1= "select productid,quantity,price from products where orderid=?";
-			Object param1[]= {orderModel.getOrderid()};
-			List<ProductModel> pm = jdbctemplate.query(QUERY1,param1, new BeanPropertyRowMapper<ProductModel>(ProductModel.class));
+			String QUERY1 = "select productid,quantity,price from products where orderid=?";
+			Object param1[] = { orderModel.getOrderid() };
+			List<ProductModel> pm = jdbctemplate.query(QUERY1, param1,
+					new BeanPropertyRowMapper<ProductModel>(ProductModel.class));
 			orderModel.setProducts(pm);
 		}
-		
+
 		return om;
 	}
 
 	@Override
 	public boolean addOrder(OrderModel order) {
-		
-		String QUERY= "insert into orders(userid,address,totalamount,paymentstatus,deliverystatus,expecteddelivery,transactionid,status) values(?,?,?,?,?,?,?,?)";
-		Object param[]= { order.getUserid(),order.getAddress(),order.getTotalamount(),order.getPaymentstatus(),order.getDeliverystatus(),order.getExpecteddelivery(),order.getTransactionid(),"Confirmed" };
-		jdbctemplate.update(QUERY,param);
-		
+
+		String QUERY = "insert into orders(userid,address,totalamount,paymentstatus,deliverystatus,expecteddelivery,transactionid,status) values(?,?,?,?,?,?,?,?)";
+		Object param[] = { order.getUserid(), order.getAddress(), order.getTotalamount(), order.getPaymentstatus(),
+				order.getDeliverystatus(), order.getExpecteddelivery(), order.getTransactionid(), "Confirmed" };
+		jdbctemplate.update(QUERY, param);
+
 		int orderid = getOrderid(order.getTransactionid());
-		
+
 		String QUERY1 = "insert into products(productid,quantity,price,orderid) values(?,?,?,?)";
 		List<ProductModel> products = order.getProducts();
 		for (ProductModel productModel : products) {
-			Object param1[] = {productModel.getProductid(),productModel.getQuantity(),productModel.getPrice(),orderid};
-			jdbctemplate.update(QUERY1,param1);
+			Object param1[] = { productModel.getProductid(), productModel.getQuantity(), productModel.getPrice(),
+					orderid };
+			jdbctemplate.update(QUERY1, param1);
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public List<OrderModel> viewOrderByOrderId(int orderid) {
-		
-		String QUERY= "select orderid,deliverystatus,expecteddelivery,transactionid from orders where orderid=? and status=?";
-		Object param[] = { orderid,"confirmed" }; 
-		List<OrderModel> om = jdbctemplate.query(QUERY,param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
+
+		String QUERY = "select orderid,deliverystatus,expecteddelivery,transactionid from orders where orderid=? and status=?";
+		Object param[] = { orderid, "confirmed" };
+		List<OrderModel> om = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
 		return om;
 	}
-	
+
 	@Override
 	public int getOrderid(String transactionid) {
-		
-		String QUERY= "select orderid from orders where transactionid=? and status=?";
-		Object param[] = { transactionid,"confirmed" }; 
+
+		String QUERY = "select orderid from orders where transactionid=? and status=?";
+		Object param[] = { transactionid, "confirmed" };
 		int orderid = jdbctemplate.queryForObject(QUERY, param, Integer.class);
-		
+
 		return orderid;
 	}
-	
-//
-//	@Override
-//	public void updateOrder(OrderModel order) {
-//
-//		String QUERY = "update orders set status=? ,cancel=? ,ret=? ,track=? ,payment=? where orderid=?";
-//		Object param[]= {order.isOrderstatus(),order.isCancel(),order.isRet(),order.getTrack(),order.getPaymentmode()};
-//		jdbctemplate.update(QUERY,param);
-//	}
-//
+
 	@Override
 	public boolean cancelorder(int orderid) {
 		String QUERY = "update orders set status=? where orderid=?";
-		Object param[]= { "Cancelled",orderid};
-		int i = jdbctemplate.update(QUERY,param);
-		
-		return i>0 ?  true: false;
+		Object param[] = { "Cancelled", orderid };
+		int i = jdbctemplate.update(QUERY, param);
+
+		return i > 0 ? true : false;
 	}
-	
+
+	@Override
+	public boolean updateorder(OrderModel order) {
+		
+		String QUERY = "update orders set deliverystatus=? ,paymentstatus=?, expecteddelivery=? where orderid=?";
+		Object param[] = {order.getDeliverystatus(), order.getPaymentstatus(), order.getExpecteddelivery(), order.getOrderid()};
+		int i = jdbctemplate.update(QUERY, param);
+		
+		return i > 0 ? true : false; 
+	}
+
 }

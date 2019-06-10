@@ -10,12 +10,17 @@ import org.springframework.stereotype.Service;
 import com.globant.ecommerce.dao.OrderDaoImpl;
 import com.globant.ecommerce.models.OrderModel;
 
+/**
+ * 
+ * @author utkarsh.mandade
+ *
+ */
 @Service
-public class OrderServiceImpl implements OrderService{
-	
+public class OrderServiceImpl implements OrderService {
+
 	@Autowired
 	OrderDaoImpl orderdao;
-	
+
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 		// TODO Auto-generated method stub
@@ -25,17 +30,17 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public boolean addOrder(OrderModel order) {
 		// TODO Auto-generated method stub
-		
+
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.add(Calendar.DATE, 5);
 		Date newDate = cal.getTime();
-		
+
 		order.setDeliverystatus("Not Delivered");
-		order.setExpecteddelivery(newDate+"");
-		return orderdao.addOrder(order);	
+		order.setExpecteddelivery(newDate + "");
+		return orderdao.addOrder(order);
 	}
-	
+
 	@Override
 	public List<OrderModel> viewOrderByOrderId(int orderid) {
 		// TODO Auto-generated method stub
@@ -47,22 +52,17 @@ public class OrderServiceImpl implements OrderService{
 		// TODO Auto-generated method stub
 		return orderdao.getOrderid(transactionid);
 	}
-	
-//
-//	@Override
-//	public void updateOrder(OrderModel order) {
-//		// TODO Auto-generated method stub
-//		orderdao.updateOrder(order);
-//		
-//	}
-//
+
 	@Override
 	public boolean cancelorder(int orderid) {
 		// TODO Auto-generated method stub
 		return orderdao.cancelorder(orderid);
 	}
 
-	
+	@Override
+	public boolean updateorder(OrderModel order) {
+		// TODO Auto-generated method stub
+		return orderdao.updateorder(order);
+	}
 
-	
 }

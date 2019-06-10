@@ -4,14 +4,17 @@ import java.util.List;
 
 import com.globant.ecommerce.models.OrderModel;
 
+/**
+ * @author utkarsh.mandade
+ *
+ */
 public class PlacedOrderResponse {
-	
+
 	private String Message;
 	private String StatusCode;
 	private List<OrderModel> Data;
-	
+
 	public PlacedOrderResponse() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public PlacedOrderResponse(String message, String statusCode, List<OrderModel> data) {
@@ -44,7 +47,5 @@ public class PlacedOrderResponse {
 	public void setData(List<OrderModel> data) {
 		Data = data;
 	}
-	
-	
 
 }

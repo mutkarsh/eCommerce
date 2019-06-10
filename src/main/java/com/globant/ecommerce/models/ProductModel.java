@@ -1,11 +1,15 @@
 package com.globant.ecommerce.models;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 
+/**
+ * 
+ * @author utkarsh.mandade
+ *
+ */
 @Entity
 public class ProductModel {
-	
+
 	private int productid;
 	private int quantity;
 	private double price;
@@ -43,6 +47,5 @@ public class ProductModel {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	
-	
+
 }

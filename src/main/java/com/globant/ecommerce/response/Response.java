@@ -4,12 +4,17 @@ import java.util.List;
 
 import com.globant.ecommerce.models.OrderModel;
 
+/**
+ * 
+ * @author utkarsh.mandade
+ *
+ */
 public class Response {
 
 	private String Message;
 	private String StatusCode;
 	private List<OrderModel> Data;
-	
+
 	public Response() {
 	}
 
@@ -44,6 +49,4 @@ public class Response {
 		Data = data;
 	}
 
-	
-
- }
+}
