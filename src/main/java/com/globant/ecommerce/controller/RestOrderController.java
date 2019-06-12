@@ -26,7 +26,8 @@ import com.globant.ecommerce.response.Response;
 import com.globant.ecommerce.service.OrderServiceImpl;
 
 /**
- *  Main Controller 
+ * Main Controller
+ * 
  * @author utkarsh.mandade
  *
  */
@@ -40,7 +41,8 @@ public class RestOrderController {
 	private RestTemplate restTemplate;
 
 	/**
-	 * Method to show all orders 
+	 * Method to show all orders
+	 * 
 	 * @param userid
 	 * @param authToken
 	 * @return
@@ -51,12 +53,17 @@ public class RestOrderController {
 
 		Response resp = new Response();
 
-		//  check validity based on user authToken
+		// check validity based on user authToken
 		if (authentication(authToken)) {
-			List<OrderModel> om = orderservice.viewOrder(userid);
+			List<OrderModel> orders = orderservice.viewOrder(userid);
+			if (orders.size() == 0) {
+				resp.setMessage("Not a Valid User");
+				resp.setStatusCode("401");
+				return resp;
+			}
 			resp.setMessage("Your Orders");
 			resp.setStatusCode("200");
-			resp.setData(om);
+			resp.setData(orders);
 			return resp;
 		} else {
 
@@ -69,6 +76,7 @@ public class RestOrderController {
 
 	/**
 	 * method to add order in the db
+	 * 
 	 * @param userid
 	 * @param data
 	 * @param authToken
@@ -80,7 +88,7 @@ public class RestOrderController {
 
 		PlacedOrderResponse response = new PlacedOrderResponse();
 
-		//  check validity based on user authToken
+		// check validity based on user authToken
 		if (authentication(authToken)) {
 			JSONObject object = new JSONObject(data);
 			OrderModel order = new OrderModel();
@@ -98,7 +106,13 @@ public class RestOrderController {
 			}
 
 			order.setProducts(products);
-			orderservice.addOrder(order);
+			boolean status = orderservice.addOrder(order);
+
+			if (!status) {
+				response.setMessage("Something is Wrong! Please try again.");
+				response.setStatusCode("401");
+				return response;
+			}
 
 			response.setMessage("Order Placed Successfully");
 			response.setData(orderservice.viewOrderByOrderId(orderservice.getOrderid(order.getTransactionid())));
@@ -115,6 +129,7 @@ public class RestOrderController {
 
 	/**
 	 * method to cancel the order.
+	 * 
 	 * @param orderid
 	 * @param authToken
 	 * @return
@@ -125,9 +140,15 @@ public class RestOrderController {
 
 		Response response = new Response();
 
-		//  check validity based on user authToken
+		// check validity based on user authToken
 		if (authentication(authToken)) {
-			orderservice.cancelorder(orderid);
+			
+			boolean status = orderservice.cancelorder(orderid);
+			if(!status) {
+				response.setMessage("Something Went Wrong! Plz try again.");
+				response.setStatusCode("401");
+				return response;
+			}
 			response.setMessage("Order Cancelled Successfully");
 			response.setStatusCode("200");
 			List<OrderModel> orders = new ArrayList<OrderModel>();
@@ -144,6 +165,7 @@ public class RestOrderController {
 
 	/**
 	 * method to update the order status
+	 * 
 	 * @param orderid
 	 * @param data
 	 * @param authToken
@@ -152,18 +174,18 @@ public class RestOrderController {
 	@PostMapping("/order/updateOrder/{orderid}")
 	public Response updateOrder(@PathVariable("orderid") int orderid, @RequestBody String data,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
-		
+
 		Response response = new Response();
 		// check validity based on user authToken
-		if(authentication(authToken)) {
-			
+		if (authentication(authToken)) {
+
 			JSONObject object = new JSONObject(data);
 			OrderModel order = new OrderModel();
 			order.setOrderid(object.getInt("orderid"));
 			order.setDeliverystatus(object.getString("deliveryStatus"));
 			order.setPaymentstatus(object.getString("paymentStatus"));
 			order.setExpecteddelivery(object.getString("expectedDelivery"));
-			
+
 			orderservice.updateorder(order);
 
 			List<OrderModel> orders = Arrays.asList(order);
@@ -171,17 +193,17 @@ public class RestOrderController {
 			response.setData(orders);
 			response.setStatusCode("200");
 			return response;
-			
-		}
-		else {
+
+		} else {
 			response.setMessage("user not Logged In");
 			response.setStatusCode("401");
-			return response;	
+			return response;
 		}
 	}
 
 	/**
 	 * Authentication service for checking valid user using authenticationToken
+	 * 
 	 * @param authToken
 	 * @return
 	 */
@@ -202,5 +224,4 @@ public class RestOrderController {
 			return false;
 		}
 	}
-
 }
