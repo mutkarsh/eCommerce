@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.globant.ecommerce.facade.OrderFacadeImpl;
 import com.globant.ecommerce.models.OrderModel;
 import com.globant.ecommerce.models.ProductModel;
 import com.globant.ecommerce.response.PlacedOrderResponse;
@@ -35,7 +36,7 @@ import com.globant.ecommerce.service.OrderServiceImpl;
 public class RestOrderController {
 
 	@Autowired
-	OrderServiceImpl orderservice;
+	OrderFacadeImpl orderservice;
 
 	@Autowired
 	private RestTemplate restTemplate;
