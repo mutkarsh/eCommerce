@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,6 @@ import com.globant.ecommerce.models.OrderModel;
 import com.globant.ecommerce.models.ProductModel;
 import com.globant.ecommerce.response.PlacedOrderResponse;
 import com.globant.ecommerce.response.Response;
-import com.globant.ecommerce.service.OrderServiceImpl;
 
 /**
  * Main Controller
@@ -48,29 +48,43 @@ public class RestOrderController {
 	 * @param authToken
 	 * @return
 	 */
-	@GetMapping("/order/viewOrder/{userid}")
-	public Response viewOrder(@PathVariable("userid") int userid,
+	@GetMapping("/order/{userid}")
+	public ResponseEntity<List<OrderModel>> viewOrder(@PathVariable("userid") int userid,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
-		Response resp = new Response();
+//		Response resp = new Response();
 
 		// check validity based on user authToken
 		if (authentication(authToken)) {
+			
 			List<OrderModel> orders = orderservice.viewOrder(userid);
 			if (orders.size() == 0) {
-				resp.setMessage("Not a Valid User");
-				resp.setStatusCode("401");
-				return resp;
+				
+				HttpHeaders headers = new HttpHeaders();
+			    headers.add("Message", "not a valid userID");
+			    return new ResponseEntity<>(null, headers, HttpStatus.NO_CONTENT);	
+//				resp.setMessage("Invalid userid");
+//				resp.setStatusCode("401");
+//				return resp;
 			}
-			resp.setMessage("Your Orders");
-			resp.setStatusCode("200");
-			resp.setData(orders);
-			return resp;
+			HttpHeaders headers = new HttpHeaders();
+		    headers.add("Message", "Your Orders");
+		    return new ResponseEntity<>(orders, headers, HttpStatus.OK);
+
+//			resp.setMessage("Your Orders");
+//			resp.setStatusCode("200");
+//			resp.setData(orders);
+//			return resp;
 		} else {
 
-			resp.setMessage("user not Logged In");
-			resp.setStatusCode("401");
-			return resp;
+
+			HttpHeaders headers = new HttpHeaders();
+		    headers.add("Message", "Authentication Failed");
+		    return new ResponseEntity<>(null, headers, HttpStatus.UNAUTHORIZED);
+
+//			resp.setMessage("user not Logged In");
+//			resp.setStatusCode("401");
+//			return resp;
 		}
 
 	}
@@ -84,10 +98,10 @@ public class RestOrderController {
 	 * @return
 	 */
 	@PostMapping("/order/placeorder/{userid}")
-	public PlacedOrderResponse placeOrder(@PathVariable("userid") int userid, @RequestBody String data,
+	public ResponseEntity<List<OrderModel>> placeOrder(@PathVariable("userid") int userid, @RequestBody String data,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
-		PlacedOrderResponse response = new PlacedOrderResponse();
+//		PlacedOrderResponse response = new PlacedOrderResponse();
 
 		// check validity based on user authToken
 		if (authentication(authToken)) {
@@ -110,20 +124,32 @@ public class RestOrderController {
 			boolean status = orderservice.addOrder(order);
 
 			if (!status) {
-				response.setMessage("Something is Wrong! Please try again.");
-				response.setStatusCode("401");
-				return response;
+				HttpHeaders headers = new HttpHeaders();
+			    headers.add("Message", "Something went Wrong! Please try again.");
+			    return new ResponseEntity<>(null, headers, HttpStatus.NO_CONTENT);
+//				response.setMessage("Something is Wrong! Please try again.");
+//				response.setStatusCode("401");
+//				return response;
 			}
 
-			response.setMessage("Order Placed Successfully");
-			response.setData(orderservice.viewOrderByOrderId(orderservice.getOrderid(order.getTransactionid())));
-			response.setStatusCode("200");
-			return response;
+			 HttpHeaders headers = new HttpHeaders();
+			    headers.add("Message", "Order Placed Successfully");
+			    List<OrderModel> orders = orderservice.viewOrderByOrderId(orderservice.getOrderid(order.getTransactionid()));
+			    return new ResponseEntity<>(orders, headers, HttpStatus.OK);
+
+//			response.setMessage("Order Placed Successfully");
+//			response.setData(orderservice.viewOrderByOrderId(orderservice.getOrderid(order.getTransactionid())));
+//			response.setStatusCode("200");
+//			return response;
 		} else {
 
-			response.setMessage("user not Logged In");
-			response.setStatusCode("401");
-			return response;
+			HttpHeaders headers = new HttpHeaders();
+		    headers.add("Message", "Authentication Failed, User not Logged in");
+		    return new ResponseEntity<>(null, headers, HttpStatus.UNAUTHORIZED);
+//			response.setMessage("user not Logged In");
+//			response.setStatusCode("401");
+//			return response;
+			
 		}
 
 	}
@@ -135,32 +161,47 @@ public class RestOrderController {
 	 * @param authToken
 	 * @return
 	 */
-	@PostMapping("/order/cancelorder/{orderid}")
-	public Response cancelOrder(@PathVariable("orderid") int orderid,
+	@PostMapping("/order/cancel/{orderid}")
+	public ResponseEntity<OrderModel> cancelOrder(@PathVariable("orderid") int orderid,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
-		Response response = new Response();
+//		Response response = new Response();
 
 		// check validity based on user authToken
 		if (authentication(authToken)) {
 			
 			boolean status = orderservice.cancelorder(orderid);
 			if(!status) {
-				response.setMessage("Something Went Wrong! Plz try again.");
-				response.setStatusCode("401");
-				return response;
+
+				HttpHeaders headers = new HttpHeaders();
+			    headers.add("Message", "order not found");
+			    return new ResponseEntity<>(null, headers, HttpStatus.NO_CONTENT);
+
+//				response.setMessage("Something Went Wrong! Plz try again.");
+//				response.setStatusCode("401");
+//				return response;
 			}
-			response.setMessage("Order Cancelled Successfully");
-			response.setStatusCode("200");
-			List<OrderModel> orders = new ArrayList<OrderModel>();
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Message", "Order Canceled Successfully");
 			OrderModel order = new OrderModel();
 			order.setOrderid(orderid);
-			response.setData(orders);
-			return response;
-		} else {
-			response.setMessage("user not Logged In");
-			response.setStatusCode("401");
-			return response;
+			return new ResponseEntity<>(order, headers, HttpStatus.OK);
+		    
+//			response.setMessage("Order Cancelled Successfully");
+//			response.setStatusCode("200");
+//			List<OrderModel> orders = new ArrayList<OrderModel>();
+//			OrderModel order = new OrderModel();
+//			order.setOrderid(orderid);
+//			response.setData(orders);
+//			return response;
+		} 
+		else {
+			HttpHeaders headers = new HttpHeaders();
+		    headers.add("Message", "Authentication Failed/User not Logged in");
+		    return new ResponseEntity<>(null, headers, HttpStatus.UNAUTHORIZED);
+//			response.setMessage("user not Logged In");
+//			response.setStatusCode("401");
+//			return response;
 		}
 	}
 
@@ -173,7 +214,7 @@ public class RestOrderController {
 	 * @return
 	 */
 	@PostMapping("/order/updateOrder/{orderid}")
-	public Response updateOrder(@PathVariable("orderid") int orderid, @RequestBody String data,
+	public ResponseEntity<OrderModel> updateOrder(@PathVariable("orderid") int orderid, @RequestBody String data,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
 		Response response = new Response();
@@ -187,18 +228,32 @@ public class RestOrderController {
 			order.setPaymentstatus(object.getString("paymentStatus"));
 			order.setExpecteddelivery(object.getString("expectedDelivery"));
 
-			orderservice.updateorder(order);
+			boolean status = orderservice.updateorder(order);
+			if(!status) {
 
-			List<OrderModel> orders = Arrays.asList(order);
-			response.setMessage("Order Updated Successfully");
-			response.setData(orders);
-			response.setStatusCode("200");
-			return response;
+				HttpHeaders headers = new HttpHeaders();
+			    headers.add("Message", "order not found");
+			    return new ResponseEntity<>(null, headers, HttpStatus.NO_CONTENT);
+
+//				response.setMessage("Something Went Wrong! Plz try again.");
+//				response.setStatusCode("401");
+//				return response;
+			}
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Message", "Order Updated Successfully");
+			return new ResponseEntity<>(order, headers, HttpStatus.OK);
+//			response.setMessage("Order Updated Successfully");
+//			response.setData(orders);
+//			response.setStatusCode("200");
+//			return response;
 
 		} else {
-			response.setMessage("user not Logged In");
-			response.setStatusCode("401");
-			return response;
+			HttpHeaders headers = new HttpHeaders();
+		    headers.add("Message", "Authentication Failed/User not Logged in");
+		    return new ResponseEntity<>(null, headers, HttpStatus.UNAUTHORIZED);
+//			response.setMessage("user not Logged In");
+//			response.setStatusCode("401");
+//			return response;
 		}
 	}
 
@@ -210,7 +265,10 @@ public class RestOrderController {
 	 */
 	public boolean authentication(String authToken) {
 
-		String url = "http://192.168.43.163:8080/checklogin";
+		//Temporary auth Response
+		if(true) return true;
+//		final String url = "http://192.168.43.163:8080/checklogin";
+		final String url = "http://ecommerce/checklogin";
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("authToken", authToken);
 		HttpEntity<HttpHeaders> entity = new HttpEntity<HttpHeaders>(headers);

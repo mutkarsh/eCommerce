@@ -28,8 +28,8 @@ public class OrderDaoImpl implements OrderDao {
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 
-		String QUERY = "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery from orders where userid=? and status=?";
-		Object param[] = { userid, "confirmed" };
+		String QUERY = "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery from orders where userid=?";
+		Object param[] = { userid, };
 		List<OrderModel> orders = new ArrayList<OrderModel>();
 		List<ProductModel> products = new ArrayList<ProductModel>();
 		try {
@@ -42,10 +42,12 @@ public class OrderDaoImpl implements OrderDao {
 						new BeanPropertyRowMapper<ProductModel>(ProductModel.class));
 				orderModel.setProducts(products);
 			}
+			return orders;
 		} catch (Exception e) {
 			// TODO: handle exception
+			return null;
 		}
-		return orders;
+		
 	}
 
 	/**
@@ -67,14 +69,15 @@ public class OrderDaoImpl implements OrderDao {
 			String QUERY1 = "insert into products(productid,quantity,price,orderid) values(?,?,?,?)";
 			List<ProductModel> products = order.getProducts();
 			for (ProductModel productModel : products) {
-				Object param1[] = { productModel.getProductid(), productModel.getQuantity(), productModel.getPrice(),
-						orderid };
+				Object param1[] = { productModel.getProductid(), productModel.getQuantity(), productModel.getPrice(), orderid };
 				jdbctemplate.update(QUERY1, param1);
 			}
+			return result > 0 ? true : false;
 		} catch (Exception e) {
-			// TODO: handle exception
+			//  handle exception
+			return false;
 		}
-		return result > 0 ? true : false;
+		
 	}
 
 	/**
@@ -83,16 +86,26 @@ public class OrderDaoImpl implements OrderDao {
 	@Override
 	public List<OrderModel> viewOrderByOrderId(int orderid) {
 
-		String QUERY = "select orderid,deliverystatus,expecteddelivery,transactionid from orders where orderid=? and status=?";
+		String QUERY = "select * from orders where orderid=? and status=?";
 		Object param[] = { orderid, "confirmed" };
 		List<OrderModel> orders = new ArrayList<OrderModel>();
+		List<ProductModel> products = new ArrayList<ProductModel>();
 		try {
 
 			orders = jdbctemplate.query(QUERY, param, new BeanPropertyRowMapper<OrderModel>(OrderModel.class));
+			for (OrderModel orderModel : orders) {
+				String QUERY1 = "select productid,quantity,price from products where orderid=?";
+				Object param1[] = { orderModel.getOrderid() };
+				products = jdbctemplate.query(QUERY1, param1,
+						new BeanPropertyRowMapper<ProductModel>(ProductModel.class));
+				orderModel.setProducts(products);
+			}
+			return orders;
 		} catch (Exception e) {
 			// TODO: handle exception
+			return null;
 		}
-		return orders;
+		
 	}
 
 	/**
@@ -106,11 +119,13 @@ public class OrderDaoImpl implements OrderDao {
 		int orderid = -1;
 		try {
 			orderid = jdbctemplate.queryForObject(QUERY, param, Integer.class);
+			return orderid;
 		} catch (Exception e) {
 			// TODO: handle exception
+			return -1;
 		}
 
-		return orderid;
+		
 	}
 
 	/**
@@ -123,11 +138,12 @@ public class OrderDaoImpl implements OrderDao {
 		int i = 0;
 		try {
 			i = jdbctemplate.update(QUERY, param);
-			
+			return i > 0 ? true : false;
 		} catch (Exception e) {
 			// TODO: handle exception
+			return false;
 		}
-		return i > 0 ? true : false;
+		
 	}
 
 	/**
@@ -137,18 +153,15 @@ public class OrderDaoImpl implements OrderDao {
 	public boolean updateorder(OrderModel order) {
 
 		String QUERY = "update orders set deliverystatus=? ,paymentstatus=?, expecteddelivery=? where orderid=?";
-		Object param[] = { order.getDeliverystatus(), order.getPaymentstatus(), order.getExpecteddelivery(),
-				order.getOrderid() };
-		
+		Object param[] = { order.getDeliverystatus(), order.getPaymentstatus(), order.getExpecteddelivery(), order.getOrderid() };
 		int i =0;
 		try {
 			i = jdbctemplate.update(QUERY, param);
-			
+			return i > 0 ? true : false;
 		} catch (Exception e) {
 			// TODO: handle exception
+			return false;
 		}
-
-		return i > 0 ? true : false;
 	}
-
+	
 }

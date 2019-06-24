@@ -27,7 +27,9 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 		// TODO Auto-generated method stub
-		return orderdao.viewOrder(userid);
+		List<OrderModel> orders = orderdao.viewOrder(userid);
+		System.out.println(orders.size());
+		return orders;
 	}
 
 	/**

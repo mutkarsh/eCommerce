@@ -28,7 +28,9 @@ public class OrderFacadeImpl implements OrderFacade {
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 		// TODO Auto-generated method stub
-		return orderservice.viewOrder(userid);
+		List<OrderModel> orders = orderservice.viewOrder(userid);
+		System.out.println(orders.size());
+		return orders;
 	}
 
 	/**
