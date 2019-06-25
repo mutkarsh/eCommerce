@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @SpringBootApplication
 @ComponentScan({ "com.globant" })
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 public class EcommerceApplication {
 
 	public static void main(String[] args) {

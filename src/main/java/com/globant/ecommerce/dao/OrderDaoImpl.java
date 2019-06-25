@@ -28,7 +28,7 @@ public class OrderDaoImpl implements OrderDao {
 	@Override
 	public List<OrderModel> viewOrder(int userid) {
 
-		String QUERY = "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery from orders where userid=?";
+		String QUERY = "select orderid,userid,totalamount,address,deliverystatus,paymentstatus,expecteddelivery,transactionid,status from orders where userid=?";
 		Object param[] = { userid, };
 		List<OrderModel> orders = new ArrayList<OrderModel>();
 		List<ProductModel> products = new ArrayList<ProductModel>();
@@ -44,7 +44,7 @@ public class OrderDaoImpl implements OrderDao {
 			}
 			return orders;
 		} catch (Exception e) {
-			// TODO: handle exception
+			//  handle exception
 			return null;
 		}
 		
@@ -133,8 +133,8 @@ public class OrderDaoImpl implements OrderDao {
 	 */
 	@Override
 	public boolean cancelorder(int orderid) {
-		String QUERY = "update orders set status=? where orderid=?";
-		Object param[] = { "Cancelled", orderid };
+		String QUERY = "update orders set status=? where orderid=? and status!=?";
+		Object param[] = { "Cancelled", orderid ,"Cancelled"};
 		int i = 0;
 		try {
 			i = jdbctemplate.update(QUERY, param);

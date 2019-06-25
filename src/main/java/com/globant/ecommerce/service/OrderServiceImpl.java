@@ -28,7 +28,6 @@ public class OrderServiceImpl implements OrderService {
 	public List<OrderModel> viewOrder(int userid) {
 		// TODO Auto-generated method stub
 		List<OrderModel> orders = orderdao.viewOrder(userid);
-		System.out.println(orders.size());
 		return orders;
 	}
 

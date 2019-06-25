@@ -26,12 +26,13 @@ public class OrderModel {
 	private String paymentstatus;
 	private String expecteddelivery;
 	private String transactionid;
+	private String status;
 
 	public OrderModel() {
 	}
 
 	public OrderModel(int orderid, int userid, List<ProductModel> products, double totalamount, String address,
-			String deliverystatus, String paymentstatus, String expecteddelivery, String transactionid) {
+			String deliverystatus, String paymentstatus, String expecteddelivery, String transactionid, String status) {
 		super();
 		this.orderid = orderid;
 		this.userid = userid;
@@ -42,6 +43,7 @@ public class OrderModel {
 		this.paymentstatus = paymentstatus;
 		this.expecteddelivery = expecteddelivery;
 		this.transactionid = transactionid;
+		this.status = status;
 	}
 
 	public int getOrderid() {
@@ -116,4 +118,11 @@ public class OrderModel {
 		this.transactionid = transactionid;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }

@@ -55,6 +55,7 @@ public class RestOrderController {
 //		Response resp = new Response();
 
 		// check validity based on user authToken
+		
 		if (authentication(authToken)) {
 			
 			List<OrderModel> orders = orderservice.viewOrder(userid);
@@ -162,7 +163,7 @@ public class RestOrderController {
 	 * @return
 	 */
 	@PostMapping("/order/cancel/{orderid}")
-	public ResponseEntity<OrderModel> cancelOrder(@PathVariable("orderid") int orderid,
+	public ResponseEntity<String> cancelOrder(@PathVariable("orderid") int orderid,
 			@RequestHeader(value = "authToken", defaultValue = "") String authToken) {
 
 //		Response response = new Response();
@@ -174,8 +175,8 @@ public class RestOrderController {
 			if(!status) {
 
 				HttpHeaders headers = new HttpHeaders();
-			    headers.add("Message", "order not found");
-			    return new ResponseEntity<>(null, headers, HttpStatus.NO_CONTENT);
+			    headers.add("Message", "order already canceled");
+			    return new ResponseEntity<>("", headers, HttpStatus.NO_CONTENT);
 
 //				response.setMessage("Something Went Wrong! Plz try again.");
 //				response.setStatusCode("401");
@@ -185,7 +186,7 @@ public class RestOrderController {
 			headers.add("Message", "Order Canceled Successfully");
 			OrderModel order = new OrderModel();
 			order.setOrderid(orderid);
-			return new ResponseEntity<>(order, headers, HttpStatus.OK);
+			return new ResponseEntity<>("", headers, HttpStatus.OK);
 		    
 //			response.setMessage("Order Cancelled Successfully");
 //			response.setStatusCode("200");
@@ -198,7 +199,7 @@ public class RestOrderController {
 		else {
 			HttpHeaders headers = new HttpHeaders();
 		    headers.add("Message", "Authentication Failed/User not Logged in");
-		    return new ResponseEntity<>(null, headers, HttpStatus.UNAUTHORIZED);
+		    return new ResponseEntity<>("", headers, HttpStatus.UNAUTHORIZED);
 //			response.setMessage("user not Logged In");
 //			response.setStatusCode("401");
 //			return response;
@@ -265,21 +266,24 @@ public class RestOrderController {
 	 */
 	public boolean authentication(String authToken) {
 
+
+		try {
 		//Temporary auth Response
 		if(true) return true;
-//		final String url = "http://192.168.43.163:8080/checklogin";
-		final String url = "http://ecommerce/checklogin";
+		final String url = "http://192.168.43.163:8080/checklogin";
+//		final String url = "http://ecommerce/checklogin";
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("authToken", authToken);
-		HttpEntity<HttpHeaders> entity = new HttpEntity<HttpHeaders>(headers);
-		ResponseEntity<String> resp = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-		JSONObject jo = new JSONObject(resp.getBody());
-		String statusCode = jo.getString("statusCode");
-		System.out.println(statusCode);
-		if (statusCode.equals("200")) {
-			return true;
-		} else {
-			System.out.println("User Not Logged In");
+		System.out.println("checking ....Auth Token");
+		HttpEntity entity = new HttpEntity(headers);
+		ResponseEntity<String> resp = restTemplate.exchange(
+		   url, HttpMethod.GET, entity, String.class);
+		System.out.println("checked");
+		System.out.println(resp.getStatusCodeValue());
+		if(resp.getStatusCodeValue()==200) return true;
+		return false;
+		}
+		catch(Exception e) {
 			return false;
 		}
 	}
